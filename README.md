@@ -61,11 +61,6 @@ Edit file `.env` sesuai kebutuhan (password bisa dibiarkan default untuk develop
 ```bash
 # Isi minimal ini:
 AIRFLOW_UID=50000
-ETL_POSTGRES_USER=etl
-ETL_POSTGRES_PASSWORD=etl_secret   # ganti jika perlu
-ETL_POSTGRES_DB=etl_db
-ETL_POSTGRES_HOST=localhost
-ETL_POSTGRES_PORT=5433
 ```
 
 ### 3. Jalankan Docker Compose
@@ -107,12 +102,12 @@ Buka **Admin → Connections → `+`** lalu isi:
 
 | Field | Value |
 |---|---|
-| Connection ID | `postgres_etl` |
+| Connection ID | `postgres_etl(bebas terserah anda)` |
 | Connection Type | `Postgres` |
-| Host | `postgres-etl` |
-| Database | `etl_db` |
-| Login | `etl` |
-| Password | `etl_secret` |
+| Host | `<lihat host di akun neon anda>` |
+| Database | `<lihat database di akun neon anda>` |
+| Login | `<lihat username di akun neon anda>` |
+| Password | `<lihat password di akun neon anda>` |
 | Port | `5432` |
 
 Klik **Save**.
