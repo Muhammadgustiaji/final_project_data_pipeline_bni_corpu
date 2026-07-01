@@ -1,0 +1,7 @@
+channel_id,channel_code,channel_name,channel_category,is_digital,description
+1,ATM,ATM,PHYSICAL,False,Anjungan Tunai Mandiri
+2,MB,Mobile Banking,DIGITAL,True,Transaksi via aplikasi mobile
+3,IB,Internet Banking,DIGITAL,True,Transaksi via browser / web
+4,TELLER,Teller,PHYSICAL,False,Transaksi di counter cabang
+5,EDC,EDC / Mesin Kasir,PHYSICAL,False,Electronic Data Capture di merchant
+6,CS,Call Center / IVR,DIGITAL,True,Transaksi via telepon
