@@ -30,20 +30,32 @@ SELECT DISTINCT ON (customer_id)
     customer_code,
     full_name,
     gender,
-    birth_date::DATE,
+    NULLIF(birth_date, '')::DATE AS birth_date,
     email,
     phone,
     segment,
     job_segment,
     city,
     province,
-    registration_date::DATE,
+    NULLIF(registration_date, '')::DATE AS registration_date,
     branch_id,
-    CASE WHEN LOWER(is_active) = 'true' THEN TRUE ELSE FALSE END AS is_active,
+
+    -- konversi is_active dari text ke boolean
+    CASE
+        WHEN LOWER(is_active) IN ('true', 't', '1', 'yes', 'y') THEN TRUE
+        ELSE FALSE
+    END AS is_active,
+
     credit_score,
-    estimated_salary,
+    estimated_salary::NUMERIC(18,2),
+
     -- usia dari birth_date
-    DATE_PART('year', AGE(CURRENT_DATE, birth_date::DATE))::SMALLINT AS age,
+    CASE
+        WHEN NULLIF(birth_date, '') IS NOT NULL THEN
+            DATE_PART('year', AGE(CURRENT_DATE, NULLIF(birth_date, '')::DATE))::SMALLINT
+        ELSE NULL
+    END AS age,
+
     -- segmentasi credit score
     CASE
         WHEN credit_score < 580 THEN 'Poor'
@@ -52,14 +64,16 @@ SELECT DISTINCT ON (customer_id)
         WHEN credit_score < 800 THEN 'Very Good'
         ELSE 'Exceptional'
     END AS credit_score_segment,
+
     -- segmentasi gaji
     CASE
-        WHEN estimated_salary <  5000000  THEN 'Low'
-        WHEN estimated_salary < 15000000  THEN 'Lower Middle'
-        WHEN estimated_salary < 30000000  THEN 'Middle'
-        WHEN estimated_salary < 50000000  THEN 'Upper Middle'
+        WHEN estimated_salary <  5000000 THEN 'Low'
+        WHEN estimated_salary < 15000000 THEN 'Lower Middle'
+        WHEN estimated_salary < 30000000 THEN 'Middle'
+        WHEN estimated_salary < 50000000 THEN 'Upper Middle'
         ELSE 'High'
     END AS salary_segment
+
 FROM stg_customers
 WHERE customer_id IS NOT NULL
 ORDER BY customer_id;
