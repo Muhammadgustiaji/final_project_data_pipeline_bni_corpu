@@ -9,7 +9,7 @@ CONN_ID = "postgres_etl"
 
 @dag(
     dag_id="dag_build_marts",
-    description="Build semua tabel mart analytics secara berurutan",
+    description="Build semua tabel mart analytics",
     default_args={
         "owner": "airflow",
         "retries": 1,
@@ -19,6 +19,7 @@ CONN_ID = "postgres_etl"
     start_date=datetime(2025, 1, 1),
     schedule=None,
     catchup=False,
+    max_active_runs=1,
     tags=["mart", "analytics", "postgresql"],
     template_searchpath=["/opt/airflow/include/sql/marts"],
 )
@@ -28,6 +29,13 @@ def dag_build_marts():
         task_id="00_create_mart_tables",
         conn_id=CONN_ID,
         sql="00_create_mart_tables.sql",
+        split_statements=True,
+    )
+
+    create_indexes = SQLExecuteQueryOperator(
+        task_id="00_create_indexes",
+        conn_id=CONN_ID,
+        sql="00_create_indexes.sql",
         split_statements=True,
     )
 
@@ -66,22 +74,23 @@ def dag_build_marts():
         split_statements=True,
     )
 
-    mart_risk_fraud_detection = SQLExecuteQueryOperator(
-        task_id="06_mart_risk_fraud_detection",
+    mart_risk_fraud_performance = SQLExecuteQueryOperator(
+        task_id="06_mart_risk_fraud_performance",
         conn_id=CONN_ID,
-        sql="06_mart_risk_fraud_detection.sql",
+        sql="06_mart_risk_fraud_performance.sql",
         split_statements=True,
     )
 
-    (
-        create_mart_tables
-        >> mart_transaction_analytics
-        >> mart_customer_360
-        >> mart_branch_performance
-        >> mart_channel_analysis
-        >> mart_product_performance
-        >> mart_risk_fraud_detection
-    )
+    create_mart_tables >> create_indexes
+
+    create_indexes >> [
+        mart_transaction_analytics,
+        mart_customer_360,
+        mart_branch_performance,
+        mart_channel_analysis,
+        mart_product_performance,
+        mart_risk_fraud_performance,
+    ]
 
 
 dag_build_marts()
